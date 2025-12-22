@@ -13,6 +13,10 @@ on:
       - main
     types: [closed]
 
+# 授予 GITHUB_TOKEN 创建 Release 的权限
+permissions:
+  contents: write
+
 jobs:
   build:
     # 仅在push到master/main或PR被合并时运行
