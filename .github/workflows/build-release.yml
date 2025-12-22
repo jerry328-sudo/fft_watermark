@@ -1,0 +1,85 @@
+name: Build and Release Windows Exe
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+      - main
+    types: [closed]
+
+jobs:
+  build:
+    # 仅在push到master/main或PR被合并时运行
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install dearpygui numpy opencv-python scipy
+      
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --noconsole --name "FFT_Watermark" --clean fft_watermark_app.py
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFT_Watermark_Windows
+          path: dist/FFT_Watermark.exe
+          retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    # 仅在有tag时创建release
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FFT_Watermark_Windows
+          path: ./release
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: FFT Watermark ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## FFT 频域水印工具 ${{ steps.get_version.outputs.VERSION }}
+            
+            ### 📥 下载
+            - `FFT_Watermark.exe` - Windows 可执行文件（无需安装Python）
+            
+            ### 📝 更新内容
+            - 自动构建发布
+            
+            ### 💻 系统要求
+            - Windows 10/11 64位
+          files: |
+            ./release/FFT_Watermark.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

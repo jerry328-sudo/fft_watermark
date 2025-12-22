@@ -159,6 +159,22 @@ fft_watermark/
 - [ ] 添加更多水印嵌入算法
 - [ ] 支持视频水印
 
+## 🔨 构建与发布
+
+### 手动构建
+
+如需本地打包，可执行：
+
+```bash
+# 安装 PyInstaller
+pip install pyinstaller
+
+# 打包为单文件 exe（无控制台窗口）
+pyinstaller --onefile --noconsole --name "FFT_Watermark" fft_watermark_app.py
+```
+
+生成的可执行文件位于 `dist/FFT_Watermark.exe`
+
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
