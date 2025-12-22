@@ -161,6 +161,25 @@ fft_watermark/
 
 ## 🔨 构建与发布
 
+本项目使用 **GitHub Actions** 实现自动化构建和发布：
+
+### 自动构建触发条件
+
+- 向 `master` 或 `main` 分支推送代码
+- Pull Request 合并到 `master` 或 `main` 分支
+
+### 发布新版本
+
+1. 创建版本标签并推送：
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. GitHub Actions 会自动：
+   - 使用 PyInstaller 打包为 Windows 单文件 exe
+   - 创建 Release 并上传可执行文件
+
 ### 手动构建
 
 如需本地打包，可执行：
@@ -177,4 +196,4 @@ pyinstaller --onefile --noconsole --name "FFT_Watermark" fft_watermark_app.py
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件 
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
